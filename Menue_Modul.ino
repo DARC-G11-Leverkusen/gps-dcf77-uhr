@@ -3,9 +3,6 @@
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V.
  *
  *	geschrieben von Ralf Rumbler, DO3KV, 04.04.2018
-	Nix da!
-
-
  */
 
 #include <Arduino.h>
