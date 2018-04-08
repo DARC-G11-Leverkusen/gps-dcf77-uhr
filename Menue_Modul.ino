@@ -3,6 +3,9 @@
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V.
  *
  *	geschrieben von Ralf Rumbler, DO3KV, 04.04.2018
+ *
+ *	Teile des Programms für den Zugriff auf den EEPROM sind von Matthias Busse
+ *	und Teile für die Benutzung des Rotary Encoders und dessen Button sind von Simon Merrett
  */
 
 #include <Arduino.h>
