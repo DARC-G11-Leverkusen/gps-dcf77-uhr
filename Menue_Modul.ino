@@ -3,7 +3,7 @@
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V.
  *
  *	geschrieben von Ralf Rumbler, DO3KV, 04.04.2018
- *	FISCH
+ *	Quak
  */
 
 #include <Arduino.h>
