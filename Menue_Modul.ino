@@ -11,6 +11,7 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include <EEPROM.h>
+#include <TestMenue.h>
 
 LiquidCrystal lcd(4,5,9,10,11,12);
 
@@ -56,6 +57,8 @@ void setup(){
 	// button section of setup
 	pinMode (buttonPin, INPUT_PULLUP); // setup the button pin
 	// DEBUGGING section of setup
+
+	pinMode(13, OUTPUT);
 
 	lcd.begin(16, 2);
 }
@@ -105,6 +108,8 @@ void loop(){
 			 Aktion[3] = 0;
 			 MenueEintrag[4] = "90";
 			 Aktion[4] = 1;
+
+			 Blink();
 		}break;
 
 		default:{
