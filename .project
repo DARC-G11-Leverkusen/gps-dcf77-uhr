@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Arduino Uhr</name>
+	<comment>Arduino Projekt dass GPS Informationen und DCF77 Signale für weitere Projekte zur Verfügung stellt</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+</projectDescription>
