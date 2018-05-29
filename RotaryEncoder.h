@@ -3,8 +3,8 @@
  * It was put together to a library and was edited by Ralf Rumbler on 29.5.2018.
  */
 
-#ifndef TestMenue_h
-#define TestMenue_h
+#ifndef RotaryEncoder_h
+#define RotaryEncoder_h
 
 #include <Arduino.h>
 
@@ -22,7 +22,7 @@ byte _buttonPin;					   // variable that is needed to use the buttonPin variable
 byte oldButtonState = HIGH;  		   // assume switch open because of pull-up resistor
 const unsigned long debounceTime = 10; // milliseconds
 unsigned long buttonPressTime;  	   // when the switch last changed state
-boolean buttonPressed = 0; 			   // a flag variablet
+boolean encoderButtonPressed = 0;	   // a flag variablet
 
 
 void PinA(){ //Rotary encoder interrupt service routine for one encoder pin
@@ -56,10 +56,10 @@ void encoderButtonRead(){
 	    	buttonPressTime = millis ();  	// when we closed the switch
 	    	oldButtonState =  buttonState;  // remember for next time
 	    if (buttonState == LOW){
-	    	buttonPressed = 1;
+	    	encoderButtonPressed = 1;
 	    }
 	    else {
-	    	buttonPressed = 0;
+	    	encoderButtonPressed = 0;
 	    }
 	  }  // end if debounce time up
 	} // end of state change
