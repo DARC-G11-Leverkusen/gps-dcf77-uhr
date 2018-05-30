@@ -15,8 +15,9 @@ LiquidCrystal lcd(4,5,9,10,11,12);
 
 //MenueFuehrung
 byte menueEintragSprung = LOW;
-byte menueFuehrungState = HIGH;
-byte menueRotaryEncoderState = 1;
+byte menueFuehrungZustand = HIGH;
+byte menueRotaryEncoder = 1;
+byte menueZurueckPfeil = 1;
 long menueAdresse = 1;
 int menueEintraegeAnzahl;
 char* menueCursorZeichen[1];
@@ -27,9 +28,50 @@ byte stateAktion = LOW;
 byte CursorPos = 0;  // 0 = oben ; 1 = unten
 int Auswahl = 1; 	 // Auswahl sagt auf welchem MenueEintrag[] Cursor ist
 
+void menueClear(){
+	Auswahl = 1;
+	CursorPos = 0;
+	encoderPos = 0;
+	lcd.clear();
+	memset(menueEintrag, 0, sizeof menueEintrag);
+	memset(menueCursorZeichen, 0, sizeof menueCursorZeichen);
+}
+
+void menueEbeneZurueck(){
+	int multiplier = 10;
+
+	while(1){
+		if(menueAdresse < multiplier*10){
+			while(menueAdresse >= multiplier){
+				menueAdresse -= multiplier;
+			}
+			break;
+		}
+		multiplier *= 10;
+	}
+
+	menueClear();
+}
+
+void menueEbeneVor(){
+	int multiplier = 10;
+
+	while(1){
+		if(menueAdresse < multiplier){
+			menueAdresse += (multiplier*Auswahl);
+			break;
+		}
+		else{
+			multiplier *= 10;
+		}
+	}
+
+	menueClear();
+}
+
 void menueFuehrung(){
-	if(menueFuehrungState == HIGH){
-		if(menueRotaryEncoderState == 1){
+	if(menueFuehrungZustand == HIGH){
+		if(menueRotaryEncoder == 1 && menueEintraegeAnzahl+menueZurueckPfeil > 1){
 			if(encoderPos >= 1 && CursorPos == 0){
 				Auswahl++;
 				CursorPos = 1;
@@ -39,14 +81,14 @@ void menueFuehrung(){
 				Auswahl++;
 				//CursorPos bleibt 1
 
-				if(Auswahl > menueEintraegeAnzahl+1){  //Cursor ist schon ganz unten
+				if(Auswahl > menueEintraegeAnzahl+menueZurueckPfeil){  //Cursor ist schon ganz unten
 					if(menueEintragSprung == HIGH){
 						Auswahl = 1;
 						CursorPos = 0;
 						lcd.clear();
 					}
 					else{
-						Auswahl = menueEintraegeAnzahl+1;
+						Auswahl = menueEintraegeAnzahl+menueZurueckPfeil;
 					}
 				}
 				else lcd.clear();
@@ -57,7 +99,7 @@ void menueFuehrung(){
 
 				if(Auswahl < 1){  // Cursor ist schon ganz oben
 					if(menueEintragSprung == HIGH){
-						Auswahl = menueEintraegeAnzahl+1;
+						Auswahl = menueEintraegeAnzahl+menueZurueckPfeil;
 						CursorPos = 1;
 						lcd.clear();
 					}
@@ -80,14 +122,19 @@ void menueFuehrung(){
 		if(CursorPos == 0){
 			lcd.setCursor(0,0);
 			lcd.print(menueEintrag[Auswahl]);
-			lcd.setCursor(0,1);
-			lcd.print(menueEintrag[Auswahl+1]);
+
+			if(menueEintraegeAnzahl+menueZurueckPfeil > 1){
+				lcd.setCursor(0,1);
+				lcd.print(menueEintrag[Auswahl+1]);
+			}
 		}
 		else if(CursorPos == 1){
 			lcd.setCursor(0,0);
 			lcd.print(menueEintrag[Auswahl-1]);
-			lcd.setCursor(0,1);
-			lcd.print(menueEintrag[Auswahl]);
+			if(menueEintraegeAnzahl+menueZurueckPfeil > 1){
+				lcd.setCursor(0,1);
+				lcd.print(menueEintrag[Auswahl]);
+			}
 		}
 
 		lcd.setCursor(15, CursorPos);
@@ -100,8 +147,10 @@ void menueFuehrung(){
 
 		/////////////////////////////
 
-		menueEintrag[menueEintraegeAnzahl+1] = "<==";
-		menueAktion[menueEintraegeAnzahl+1] = -1;
+		if(menueZurueckPfeil == 1){
+			menueEintrag[menueEintraegeAnzahl+1] = "<==";
+			menueAktion[menueEintraegeAnzahl+1] = -1;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 
@@ -110,39 +159,14 @@ void menueFuehrung(){
 			stateAktion = HIGH;		//eine Aktion kann durch drücken des Knopfes durchgeführt werden
 		}
 		if(encoderButtonPressed == HIGH && stateAktion == HIGH){
-			int multiplier = 10;
-
 			if(menueAktion[Auswahl] == -1){		//Auswahl ist: in nächst höhere Ebene/Adresse
-			//zurückkehren in übergeordnete Ebene
-				while(1){
-					if(menueAdresse < multiplier*10){
-						while(menueAdresse >= multiplier){
-							menueAdresse -= multiplier;
-						}
-						break;
-					}
-					multiplier *= 10;
-				}
-
-				Auswahl = 1;
-				CursorPos = 0;
+				//zurückkehren in übergeordnete Ebene
+				menueEbeneZurueck();
 			}
 			else if(menueAktion[Auswahl] == 1){	//Auswahl ist: in nächst tiefere Ebene/Adresse
-				while(1){
-					if(menueAdresse < multiplier){
-						menueAdresse += (multiplier*Auswahl);
-						break;
-					}
-					else{
-						multiplier *= 10;
-					}
-				}
-
-				Auswahl = 1;
-				CursorPos = 0;
+				//tiefergehen in tiefere Ebene
+				menueEbeneVor();
 			}
-
-			lcd.clear();
 			stateAktion = LOW;
 		}
 	}
