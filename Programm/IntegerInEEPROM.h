@@ -2,7 +2,7 @@
  *	This is a library for saving and reading integer variables from the EEPROM.
  *
  *	The Code is written by Matthias Busse,
- *	and the library is put together by Ralf Rumbler on 30.5.2018 .
+ *	and the library is put together by Ralf Rumbler, DO3KV on 30.5.2018 .
  */
 
 #ifndef IntegerInEEPROM_h
