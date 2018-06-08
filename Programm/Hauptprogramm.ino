@@ -6,22 +6,21 @@
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include "RotaryEncoder.h"
-#include "MenueModul.h"
 #include "IntegerInEEPROM.h"
+#include "MenueModul.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 void setup(){
-	encoderBegin(19);
+	encoderBegin(2, 3, 19);
 	menueBegin();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
 
 void loop(){
-	switch(menueAdresse){
-	//menueAdresse max. =2.147.483.647
+	switch(menueAdresse){	//menueAdresse max. =2.147.483.647
 
 	case 1:{	//(später) Ruhe-Anzeige-Ebene (Uhrzeit wird angezeigt usw.)
 		//temporär://///////////////////////
