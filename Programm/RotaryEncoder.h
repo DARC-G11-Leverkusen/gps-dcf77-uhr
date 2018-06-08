@@ -1,6 +1,45 @@
 /*******Interrupt-based Rotary Encoder reading Library*******
- * The code is written by Simon Merrett and bases on insight from Oleg Mazurov, Nick Gammon, rt and Steve Spence, and code from Nick Gammon.
- * It was put together to a library and was edited by Ralf Rumbler on 29.5.2018.
+ * The code is written by Simon Merrett and bases on insight from Oleg Mazurov,
+ * Nick Gammon, rt and Steve Spence, and code from Nick Gammon.
+ *
+ * It was put together to a library and was edited by Ralf Rumbler, DO3KV
+ * on 6.6.2018.
+ */
+
+/********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DER LIBRARY********
+ *
+ * 	Funktionen:
+ * 	==============================================================================
+ *		encoderBegin(pinA, pinB, buttonPin)
+ *			Diese Funktion muss in der Setup() Funktion aufgerufen werden, damit
+ *			die Library funktionsfähig ist. Durch sie wird auch das Lesen des
+ *			Rotary Encoders per Interrupts aktiviert.
+ *
+ *			Zu deklarieren sind...
+ *			1. der erste Pin "pinA" und der zweite Pin "pinB", an dem der Rotary
+ *			   Encoder angeschlossen ist.
+ *			2. der Pin "buttonPin" mit dem der Zustand des Buttons (per im
+ *			   Mikrocontroller eingebautem Pull-Up Widerstand =>
+ *			   pinMode(buttonPin, INPUT_PULLUP)) gelesen wird.
+ *
+ *		encoderButtonRead()
+ *			Diese Funktion liest den Zustand des Buttons ab und speichert ihn
+ *			in der Variable "encoderButtonPressed" ab.
+ *
+ *
+ * 	Ausgabe-Variablen:
+ * 	==============================================================================
+ * 		encoderPos
+ * 			Diese Variable Beinhaltet die Position des Rotary Encoders. Nach
+ * 			Starten des Programm ist sie als erstes 0.
+ * 			Bei Drehen nach rechts wird die aktuelle Position + 1 gerechnet.
+ * 			Bei Drehen nach links wird die aktuelle Position - 1 gerechnet.
+ * 			Die Variable kann verändert werden.
+ *
+ * 		encoderButtonPressed
+ * 			Diese Variable Beinhaltet den Zustand des Buttons des Rotary Encoders.
+ * 			Wenn die Variable gleich LOW ist, ist der Button nicht gedrückt.
+ * 			Wenn die Variable gleich HIGH ist, ist der Button gedrückt.
  */
 
 #ifndef RotaryEncoder_h
@@ -9,8 +48,6 @@
 #include <Arduino.h>
 
 // Rotary encoder declarations
-static int pinA = 2;     	 // Our first hardware interrupt pin is digital pin 2
-static int pinB = 3; 		 // Our second hardware interrupt pin is digital pin 3
 volatile byte aFlag = 0; 	 // let's us know when we're expecting a rising edge on pinA to signal that the encoder has arrived at a detent
 volatile byte bFlag = 0; 	 // let's us know when we're expecting a rising edge on pinB to signal that the encoder has arrived at a detent (opposite direction to when aFlag is set)
 int encoderPos = 0; 		 // this variable stores our current value of encoder position. Change to int or uin16_t instead of byte if you want to record a larger range than 0-255
@@ -66,15 +103,18 @@ void encoderButtonRead(){
 }
 
 
-void encoderBegin(byte buttonPin){	// buttonPin: this is the Arduino pin we are connecting the push button to
+void encoderBegin(int pinA, int pinB, byte buttonPin){	// buttonPin: this is the Arduino pin we are connecting the push button to
 	_buttonPin = buttonPin;
+	static int _pinA = pinA;   	 // Our first hardware interrupt pin is digital pin 2
+	static int _pinB = pinB;	 // Our second hardware interrupt pin is digital pin 3
+
 	//Rotary encoder section of setup
-	pinMode(pinA, INPUT_PULLUP); 	// set pinA as an input, pulled HIGH to the logic voltage (5V or 3.3V for most cases)
-	pinMode(pinB, INPUT_PULLUP); 	// set pinB as an input, pulled HIGH to the logic voltage (5V or 3.3V for most cases)
-	attachInterrupt(0,PinA,RISING); // set an interrupt on PinA, looking for a rising edge signal and executing the "PinA" Interrupt Service Routine (below)
-	attachInterrupt(1,PinB,RISING); // set an interrupt on PinB, looking for a rising edge signal and executing the "PinB" Interrupt Service Routine (below)
+	pinMode(_pinA, INPUT_PULLUP); 	// set pinA as an input, pulled HIGH to the logic voltage (5V or 3.3V for most cases)
+	pinMode(_pinB, INPUT_PULLUP); 	// set pinB as an input, pulled HIGH to the logic voltage (5V or 3.3V for most cases)
+	attachInterrupt(digitalPinToInterrupt(_pinA),PinA,RISING); // set an interrupt on PinA, looking for a rising edge signal and executing the "PinA" Interrupt Service Routine (below)
+	attachInterrupt(digitalPinToInterrupt(_pinB),PinB,RISING); // set an interrupt on PinB, looking for a rising edge signal and executing the "PinB" Interrupt Service Routine (below)
 	// button section of setup
-	pinMode (buttonPin, INPUT_PULLUP); // setup the button pin
+	pinMode(buttonPin, INPUT_PULLUP); // setup the button pin
 }
 
 #endif
