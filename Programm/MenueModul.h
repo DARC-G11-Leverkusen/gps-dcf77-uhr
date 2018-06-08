@@ -158,6 +158,7 @@ void menueReset(){
 	encoderPos = 0;
 	lcd.clear();
 	memset(menueEintrag, 0, sizeof menueEintrag);
+	memset(menueAktion, 0, sizeof menueAktion);
 	memset(menueCursorZeichen, 0, sizeof menueCursorZeichen);
 }
 
