@@ -1,4 +1,4 @@
 # gps-dcf77-uhr
 Arduino Projekt dass GPS Informationen und DCF77 Signale für weitere Projekte zur Verfügung stellt
 
-Die ist ein DARC G11 Jugendgruppen Projekt
+Dies ist ein DARC G11 Jugendgruppen Projekt.
