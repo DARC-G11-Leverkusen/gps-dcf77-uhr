@@ -3,6 +3,7 @@
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  */
 
+
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include "RotaryEncoder.h"
@@ -15,6 +16,7 @@
 void setup(){
 	encoderBegin(2, 3, 19);
 	menueBegin();
+	//Serial.begin(9600);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -24,93 +26,92 @@ void loop(){
 
 	case 1:{	//(später) Ruhe-Anzeige-Ebene (Uhrzeit wird angezeigt usw.)
 		//temporär://///////////////////////
-		menueFuehrungZustand = HIGH;
-		menueRotaryEncoder = LOW;
-		menueZurueckPfeil = LOW;
-		menueEintraegeAnzahl = 1;
+		if(menueEinstellung == HIGH){
+			menueFuehrungZustand = HIGH;
+			menueRotaryEncoder = LOW;
+			menueZurueckPfeil = LOW;
+			menueEintraegeAnzahl = 1;
 
-		menueEintrag[1] = "*Ruhe-Ebene*";
+			menueEintrag[1][0] = "*Ruhe-Ebene*";
+			menueAktion[1] = 1;
+
+			menueEinstellung = LOW;
+		}
 		////////////////////////////////////
 	}break;
 
 	case 11:{	//erste Ebene der Einstellungen
-		menueFuehrungZustand = HIGH;
-		menueEintragSprung = LOW;
-		menueRotaryEncoder = HIGH;
-		menueZurueckPfeil = HIGH;
-		menueEintraegeAnzahl = 1;
-		menueCursorZeichen[0] = "<";
+		if(menueEinstellung == HIGH){
+			menueFuehrungZustand = HIGH;
+			menueEintragSprung = LOW;
+			menueRotaryEncoder = HIGH;
+			menueZurueckPfeil = HIGH;
+			menueEintraegeAnzahl = 1;
+			menueCursorZeichen[0] = "<";
 
-		menueEintrag[1] = "Wecker";
-		menueAktion[1] = 1;
+			menueEintrag[1][0] = "Wecker";
+			menueAktion[1] = 1;
 
-		weckerButtonStateA = LOW;
+			weckerButtonStateA = LOW;
+
+			menueEinstellung = LOW;
+		}
 	}break;
 
 	case 111:{
-		menueFuehrungZustand = HIGH;
-		menueEintragSprung = LOW;
-		menueRotaryEncoder = HIGH;
-		menueZurueckPfeil = HIGH;
-		menueEintraegeAnzahl = 5;
-		menueCursorZeichen[0] = "<";
-
-		menueEintrag[1] = "Wecker A";
-		menueEintrag[2] = "Wecker B";
-		menueEintrag[3] = "Wecker C";
-		menueEintrag[4] = "Wecker D";
-		menueEintrag[5] = "Wecker E";
-
-		if(encoderButtonPressed == LOW){
-			weckerButtonStateA = HIGH;
-		}
-		if(encoderButtonPressed == HIGH && weckerButtonStateA == HIGH){
-			weckerAuswahl = menueAuswahl;
-			menueReset();
-			menueAdresse = 1111;
-			Serial.println("X");
-		}
+		weckerEbeneA();
 	}break;
 
 	case 1111:{
-		menueFuehrungZustand = HIGH;
-		menueEintragSprung = LOW;
-		menueRotaryEncoder = HIGH;
-		menueZurueckPfeil = HIGH;
-		menueEintraegeAnzahl = 6;
-		menueCursorZeichen[0] = "<";
+		weckerEbeneB();
+	}break;
 
-		menueEintrag[1] = "An/Aus";
-		menueAktion[1] = 0;
-		menueEintrag[2] = "Zeit";
-		menueAktion[2] = 0;
-		menueEintrag[3] = "Wiederholen";
-		menueAktion[3] = 0;
-		menueEintrag[4] = "Weckerton";
-		menueAktion[4] = 0;
-		menueEintrag[5] = "Lautstaerke";
-		menueAktion[5] = 0;
-		menueEintrag[6] = "Entfernen";
-		menueAktion[6] = 0;
+	case 11111:{
+		weckerEbeneC_Zustand();
+	}break;
 
-		weckerButtonStateA = LOW;
+	case 21111:{
+		weckerEbeneC_ZeitA();
+	}break;
+	case 221111:{
+		weckerEbeneC_ZeitB();
+	}break;
+	case 2221111:{
+		encoderPos = 0;
+		menueAdresse = 1111;
+	}break;
+
+	case 51111:{
+		weckerEbeneC_Lautstaerke();
+	}break;
+	case 551111:{
+		encoderPos = 0;
+		menueAdresse = 1111;
 	}break;
 
 	default:{	//Fehlerausgabe, wenn derzeitige Ebene nicht definiert ist
-		menueFuehrungZustand = HIGH;
-		menueEintragSprung = LOW;
-		menueRotaryEncoder = HIGH;
-		menueZurueckPfeil = HIGH;
-		menueEintraegeAnzahl = 1;
-		menueCursorZeichen[0] = "<";
+		if(menueEinstellung == HIGH){
+			menueReset();
 
-		menueEintrag[1] = "*Ebene leer*";
-		menueAktion[1] = 0;
+			menueFuehrungZustand = HIGH;
+			menueEintragSprung = LOW;
+			menueRotaryEncoder = HIGH;
+			menueZurueckPfeil = HIGH;
+			menueEintraegeAnzahl = 1;
+			menueCursorZeichen[0] = "<";
+
+			menueEintrag[1][0] = "*Ebene leer*";
+			menueAktion[1] = 0;
+
+			menueEinstellung = LOW;
+		}
 	}break;
 	}
 
 	menueFuehrung();
 	zurRuheEbene();
+
+	//Serial.println(menueAdresse);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
