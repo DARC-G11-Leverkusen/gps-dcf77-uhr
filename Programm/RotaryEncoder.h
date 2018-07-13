@@ -3,7 +3,7 @@
  * Nick Gammon, rt and Steve Spence, and code from Nick Gammon.
  *
  * It was put together to a library and was edited by Ralf Rumbler, DO3KV
- * on 6.6.2018.
+ * on 13.7.2018.
  */
 
 /********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DER LIBRARY********
@@ -42,17 +42,19 @@
  * 			Wenn die Variable gleich HIGH ist, ist der Button gedrückt.
  */
 
+//!!!!!Erklärung zu Z.56 fehlt!!!!!
+
 #ifndef RotaryEncoder_h
 #define RotaryEncoder_h
 
 #include <Arduino.h>
 
 // Rotary encoder declarations
-volatile byte aFlag = 0; 	 // let's us know when we're expecting a rising edge on pinA to signal that the encoder has arrived at a detent
-volatile byte bFlag = 0; 	 // let's us know when we're expecting a rising edge on pinB to signal that the encoder has arrived at a detent (opposite direction to when aFlag is set)
-int encoderPos = 0; 		 // this variable stores our current value of encoder position. Change to int or uin16_t instead of byte if you want to record a larger range than 0-255
-volatile byte oldEncPos = 0; // stores the last encoder position value so we can compare to the current reading and see if it has changed (so we know when to print to the serial monitor)
-volatile byte reading = 0; 	 // somewhere to store the direct values we read from our interrupt pins before checking to see if we have moved a whole detent
+volatile byte aFlag = 0; 	 		// let's us know when we're expecting a rising edge on pinA to signal that the encoder has arrived at a detent
+volatile byte bFlag = 0; 			// let's us know when we're expecting a rising edge on pinB to signal that the encoder has arrived at a detent (opposite direction to when aFlag is set)
+int encoderPos = 0; 		 		// this variable stores our current value of encoder position. Change to int or uin16_t instead of byte if you want to record a larger range than 0-255
+volatile byte encoderChanged = 0;
+volatile byte reading = 0; 	 		// somewhere to store the direct values we read from our interrupt pins before checking to see if we have moved a whole detent
 
 // Button reading, including debounce without delay function declarations
 byte _buttonPin;					   // variable that is needed to use the buttonPin variable (declared when running encoderBegin()) in this library
@@ -67,6 +69,7 @@ void PinA(){ //Rotary encoder interrupt service routine for one encoder pin
   reading = PIND & 0xC; // read all eight pin values then strip away all but pinA and pinB's values
   if(reading == B00001100 && aFlag) { //check that we have both pins at detent (HIGH) and that we are expecting detent on this pin's rising edge
     encoderPos --; //decrement the encoder's position count
+    encoderChanged = HIGH;
     bFlag = 0; //reset flags for the next turn
     aFlag = 0; //reset flags for the next turn
   }
@@ -78,6 +81,7 @@ void PinB(){ //Rotary encoder interrupt service routine for the other encoder pi
   reading = PIND & 0xC; //read all eight pin values then strip away all but pinA and pinB's values
   if (reading == B00001100 && bFlag) { //check that we have both pins at detent (HIGH) and that we are expecting detent on this pin's rising edge
     encoderPos ++; //increment the encoder's position count
+    encoderChanged = HIGH;
     bFlag = 0; //reset flags for the next turn
     aFlag = 0; //reset flags for the next turn
   }
