@@ -2,7 +2,7 @@
  *	Menü-Modul des Projektes "Arduino Uhr" der Jugendgruppe
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  *
- * 	geschrieben von Ralf Rumbler, DO3KV 8.6.2018
+ * 	geschrieben von Ralf Rumbler, DO3KV 13.7.2018
  */
 
 /********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DES MODULS********
@@ -90,7 +90,7 @@
  *
  * 			menueEinträgeAnzahl = X;
  * 				Durch die Deklaration dieser Variable wird die Anzahl der
- * 				Menü-Einträge X (min. 1, max. 8 mit Zurück Pfeil Eintrag) der
+ * 				Menü-Einträge X (min. 0, max. 7 mit Zurück Pfeil Eintrag) der
  * 				Menü-Ebene festgelegt.
  *
  * 			menueCursorZeichen = X;
@@ -126,6 +126,8 @@
  * 				   Eintrages zu löschen
  */
 
+//!!!! Erklärung zu Z. 148, Z. 155 fehlt!!!!
+
 #ifndef MenueModul_h
 #define MenueModul_h
 
@@ -138,21 +140,30 @@ LiquidCrystal lcd(4,5,9,10,11,12);
 
 
 byte menueEintragSprung = LOW;
-byte menueFuehrungZustand = HIGH;
+byte menueFuehrungZustand = LOW;
 byte menueRotaryEncoder = 1;
 byte menueZurueckPfeil = 1;
-int menueEintraegeAnzahl;
+int menueEintraegeAnzahl = 1;
 char* menueCursorZeichen[1];
-char* menueEintrag[8];
+char* menueEintrag[8][6];			//!!!! ERKLÄRUNG !!!!
 int menueAktion[8];
 
 long menueAdresse = 1;
 byte menueCursorPos = 0;  // 0 = oben ; 1 = unten
 int menueAuswahl = 1; 	 // Auswahl sagt auf welchem MenueEintrag[] Cursor ist
 byte menueButtonAktion;
+byte menueEinstellung = HIGH;		//!!!! ERKLÄRUNG !!!!
+
 
 
 void menueReset(){
+	menueEintragSprung = LOW;
+	menueFuehrungZustand = LOW;
+	menueRotaryEncoder = 1;
+	menueZurueckPfeil = 1;
+	menueEintraegeAnzahl = 1;
+
+
 	menueAuswahl = 1;
 	menueCursorPos = 0;
 	encoderPos = 0;
@@ -160,10 +171,12 @@ void menueReset(){
 	memset(menueEintrag, 0, sizeof menueEintrag);
 	memset(menueAktion, 0, sizeof menueAktion);
 	memset(menueCursorZeichen, 0, sizeof menueCursorZeichen);
+
+	menueEinstellung = HIGH;
 }
 
 void menueEbeneHoeher(){
-	int multiplier = 10;
+	long multiplier = 10;
 
 	while(1){
 		if(menueAdresse < multiplier*10){
@@ -174,10 +187,11 @@ void menueEbeneHoeher(){
 		}
 		multiplier *= 10;
 	}
+	menueEinstellung = HIGH;
 }
 
 void menueEbeneTiefer(){
-	int multiplier = 10;
+	long multiplier = 10;
 
 	while(1){
 		if(menueAdresse < multiplier){
@@ -187,6 +201,14 @@ void menueEbeneTiefer(){
 		else{
 			multiplier *= 10;
 		}
+		Serial.println("FU");
+	}
+	menueEinstellung = HIGH;
+}
+
+void menueEintraegePrint(short Auswahl){
+	for(byte i = 0; i <= 5; i++){
+		lcd.print(menueEintrag[menueAuswahl+Auswahl][i]);
 	}
 }
 
@@ -238,38 +260,39 @@ void menueFuehrung(){
 			encoderPos = 0;
 		}
 
-		/////////////////////////////
+		//AUSGABEN///////////////////
 
 		if(menueCursorPos == 0){
 			lcd.setCursor(0,0);
-			lcd.print(menueEintrag[menueAuswahl]);
+
+			menueEintraegePrint(0);
 
 			if(menueEintraegeAnzahl+menueZurueckPfeil > 1){
 				lcd.setCursor(0,1);
-				lcd.print(menueEintrag[menueAuswahl+1]);
+				menueEintraegePrint(1);
 			}
 		}
 		else if(menueCursorPos == 1){
 			lcd.setCursor(0,0);
-			lcd.print(menueEintrag[menueAuswahl-1]);
+			menueEintraegePrint(-1);
+
 			if(menueEintraegeAnzahl+menueZurueckPfeil > 1){
 				lcd.setCursor(0,1);
-				lcd.print(menueEintrag[menueAuswahl]);
+				menueEintraegePrint(0);
 			}
 		}
 
 		lcd.setCursor(15, menueCursorPos);
 		lcd.print(menueCursorZeichen[0]);
 
-		//Serial.print(encoderPos);
-		//Serial.print("  ");
-		//Serial.println(Auswahl);
-
+		/*Serial.print(encoderPos);
+		Serial.print("  ");
+		Serial.println(Auswahl); */
 
 		/////////////////////////////
 
 		if(menueZurueckPfeil == 1){
-			menueEintrag[menueEintraegeAnzahl+1] = "<==";
+			menueEintrag[menueEintraegeAnzahl+1][0] = "<==";
 			menueAktion[menueEintraegeAnzahl+1] = -1;
 		}
 
@@ -294,7 +317,7 @@ void menueFuehrung(){
 				menueEbeneTiefer();
 			}
 			else if(menueAktion[menueAuswahl] == -2){	//Auswahl ist: in nächst höhere Ebene/Adresse OHNE menueClear()
-				menueEbeneTiefer();
+				menueEbeneHoeher();
 			}
 			menueButtonAktion = LOW;
 		}
@@ -306,6 +329,8 @@ void menueBegin(){
 }
 
 #endif
+
+
 
 
 
