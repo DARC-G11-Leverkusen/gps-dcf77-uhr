@@ -3,7 +3,6 @@
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  */
 
-
 #include <Arduino.h>
 #include <LiquidCrystal.h>
 #include "RotaryEncoder.h"
@@ -14,9 +13,12 @@
 ///////////////////////////////////////////////////////////////////////////////////
 
 void setup(){
+	Serial.begin(9600);
+
 	encoderBegin(2, 3, 19);
 	menueBegin();
-	//Serial.begin(9600);
+
+	weckerEEPROMread();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +32,7 @@ void loop(){
 			menueFuehrungZustand = HIGH;
 			menueRotaryEncoder = LOW;
 			menueZurueckPfeil = LOW;
-			menueEintraegeAnzahl = 1;
+			menueZeilenAnzahl = 1;
 
 			menueEintrag[1][0] = "*Ruhe-Ebene*";
 			menueAktion[1] = 1;
@@ -46,8 +48,8 @@ void loop(){
 			menueEintragSprung = LOW;
 			menueRotaryEncoder = HIGH;
 			menueZurueckPfeil = HIGH;
-			menueEintraegeAnzahl = 1;
-			menueCursorZeichen[0] = "<";
+			menueZeilenAnzahl = 1;
+			menueCursorZeichen = "<";
 
 			menueEintrag[1][0] = "Wecker";
 			menueAktion[1] = 1;
@@ -58,36 +60,20 @@ void loop(){
 		}
 	}break;
 
-	case 111:{
-		weckerEbeneA();
-	}break;
-
-	case 1111:{
-		weckerEbeneB();
-	}break;
-
-	case 11111:{
-		weckerEbeneC_Zustand();
-	}break;
-
-	case 21111:{
-		weckerEbeneC_ZeitA();
-	}break;
-	case 221111:{
-		weckerEbeneC_ZeitB();
-	}break;
-	case 2221111:{
-		encoderPos = 0;
-		menueAdresse = 1111;
-	}break;
-
-	case 51111:{
-		weckerEbeneC_Lautstaerke();
-	}break;
-	case 551111:{
-		encoderPos = 0;
-		menueAdresse = 1111;
-	}break;
+	//Wecker-Modul/////////////////////////////////////////////
+	case 111: weckerEbeneA(); break;
+	case 1111: weckerEbeneB(); break;
+	case 11111: weckerEbeneC_Zustand(); break;
+	case 21111: weckerEbeneC_Zeit(); break;
+	case 221111: weckerEbeneD_Zeit(); break;
+	case 2221111: encoderPos = 0; menueAdresse = 1111; break;
+	case 31111: weckerEbeneC_Wiederholen(); break;
+	case 131111: weckerEbeneD_Wiederholen(); break;
+	case 41111: weckerEbeneC_Ton(); break;
+	case 141111: weckerEbeneD_Ton(); break;
+	case 51111: weckerEbeneC_Lautstaerke(); break;
+	case 551111: encoderPos = 0; menueAdresse = 1111; break;
+	///////////////////////////////////////////////////////////
 
 	default:{	//Fehlerausgabe, wenn derzeitige Ebene nicht definiert ist
 		if(menueEinstellung == HIGH){
@@ -97,8 +83,8 @@ void loop(){
 			menueEintragSprung = LOW;
 			menueRotaryEncoder = HIGH;
 			menueZurueckPfeil = HIGH;
-			menueEintraegeAnzahl = 1;
-			menueCursorZeichen[0] = "<";
+			menueZeilenAnzahl = 1;
+			menueCursorZeichen = "<";
 
 			menueEintrag[1][0] = "*Ebene leer*";
 			menueAktion[1] = 0;
@@ -122,7 +108,7 @@ int zurRuheEbeneOldEncoderPos;
 void zurRuheEbene(){
 	if(menueAdresse != 1){
 		if(encoderPos == zurRuheEbeneOldEncoderPos){
-			if(zurRuheEbeneCounter < 8000){
+			if(zurRuheEbeneCounter < 12000){
 				delay(5);
 				zurRuheEbeneCounter += 5;
 			}
