@@ -9,15 +9,58 @@
 #define WeckerModul_h
 
 #include <Arduino.h>
+#include <EEPROM.h>
 
-int weckerDaten[5][6];
-int weckerAuswahl;
+short weckerDaten[5][6];
+byte weckerWiederholenTage[5][7];
+byte weckerAuswahl;
 byte weckerButtonStateA = LOW;
+char* weckerTonName[3];
+byte weckerEEPROMwriteState = LOW;
+byte weckerWriteDaten;
+byte anzahlToene;
+
+/*	WECKERDATEN:
+ * 	=============
+ *	weckerDaten[weckerAuswahl][0] >> Zustand >> 1 = AN ; 0 = AUS
+ * 	weckerDaten[weckerAuswahl][1] >> Zeit: Stunden >> ab 1
+ * 	weckerDaten[weckerAuswahl][2] >> Zeit: Minuten >> ab 1
+ * 	weckerDaten[weckerAuswahl][3] >> Wiederholen >> 0 = AUS ; 1 = ...
+ * 	weckerDaten[weckerAuswahl][4] >> Nummer vom ausgewählten Ton >> ab 1 ; bis 3
+ * 	anzahlToene >> Anzahl der eingespeicherten Töne
+ * 	weckerDaten[weckerAuswahl][5] >> Lautstärke Ton in %
+ */
+
+/* 	EEPROM ADRESSEN:
+ * 	=================
+ * 	 0 bis 29 >> weckerDaten[][]
+ * 	30 bis  ? >> weckerBoolPackTage
+ */
 
 char weckerBufferA[12];
 char weckerBufferB[12];
 char weckerBufferC[12];
 char weckerBufferD[12];
+
+void weckerEEPROMwrite(){
+	EEPROM.write((weckerAuswahl*6)+weckerWriteDaten, weckerDaten[weckerAuswahl][weckerWriteDaten]);
+	if(weckerWriteDaten == 1){
+		EEPROM.write((weckerAuswahl*6)+2, weckerDaten[weckerAuswahl][2]);
+	}
+
+	/*if(weckerWriteDaten == 3){
+		EEPROM.write(weckerAuswahl+30, weckerBoolPackTage[weckerAuswahl]);
+	}*/
+	Serial.print("EEPROM write");
+}
+void weckerEEPROMread(){
+	for(byte a = 0; a <= 4; a++){
+		for(byte b = 0; b <= 5; b++){
+			weckerDaten[a][b] = EEPROM.read((a*6)+b);
+		}
+		//weckerBoolPackTage[a] = EEPROM.read(a+30);
+	}
+}
 
 void weckerAusgabeZustand(){
 	if(weckerDaten[weckerAuswahl][0] == 1){
@@ -52,20 +95,25 @@ void weckerAusgabeZeit(){
 	menueEintrag[2][5] = weckerBufferB;
 }
 void weckerAusgabeWiederholen(){
-	if(weckerDaten[weckerAuswahl][3] == 0){
-		menueEintrag[3][1] = " 1x";
+	if(weckerDaten[weckerAuswahl][3] == 1){
+		menueEintrag[3][1] = "...";
 	}
 	else{
-		menueEintrag[3][1] = "...";
+		menueEintrag[3][1] = "AUS";
 	}
 }
 void weckerAusgabeTon(){
 	memset(weckerBufferC, 0, sizeof weckerBufferC);
 
-	menueEintrag[4][1] = "Nr. ";
+	if(weckerDaten[weckerAuswahl][4] > 0){
+		menueEintrag[4][1] = "Nr. ";
 
-	itoa(weckerDaten[weckerAuswahl][4], weckerBufferC, 10);
-	menueEintrag[4][2] = weckerBufferC;
+		itoa(weckerDaten[weckerAuswahl][4], weckerBufferC, 10);
+		menueEintrag[4][2] = weckerBufferC;
+	}
+	else{
+		menueEintrag[4][1] = "    -";
+	}
 }
 void weckerAusgabeLautstaerke(){
 	memset(weckerBufferD, 0, sizeof weckerBufferD);
@@ -92,8 +140,8 @@ void weckerEbeneA(){
 		menueEintragSprung = LOW;
 		menueRotaryEncoder = HIGH;
 		menueZurueckPfeil = HIGH;
-		menueEintraegeAnzahl = 5;
-		menueCursorZeichen[0] = "<";
+		menueZeilenAnzahl = 5;
+		menueCursorZeichen = "<";
 
 		menueEintrag[1][0] = "Wecker A";
 		menueEintrag[2][0] = "Wecker B";
@@ -115,21 +163,26 @@ void weckerEbeneA(){
 }
 void weckerEbeneB(){
 	if(menueEinstellung == HIGH){
+		if(weckerEEPROMwriteState == HIGH){
+			weckerEEPROMwrite();
+			weckerEEPROMwriteState = LOW;
+		}
 		menueFuehrungZustand = HIGH;
 		menueEintragSprung = LOW;
 		menueRotaryEncoder = HIGH;
 		menueZurueckPfeil = HIGH;
-		menueEintraegeAnzahl = 5;
-		menueCursorZeichen[0] = "<";
+		menueCursorZeichen = "<";
+
+		menueZeilenAnzahl = 5;
 
 		menueEintrag[1][0] = "Zustand:   ";
 		menueAktion[1] = 2;
 		menueEintrag[2][0] = "Zeit:    ";
 		menueAktion[2] = 2;
 		menueEintrag[3][0] = "Wiederh.:  ";
-		menueAktion[3] = 0;
+		menueAktion[3] = 1;
 		menueEintrag[4][0] = "Ton:     ";
-		menueAktion[4] = 0;
+		menueAktion[4] = 1;
 		menueEintrag[5][0] = "Lautst.:  ";
 		menueAktion[5] = 2;
 
@@ -147,10 +200,13 @@ void weckerEbeneB(){
 void weckerEbeneC_Zustand(){
 	if(menueEinstellung == HIGH){
 		menueRotaryEncoder = LOW;
-		menueCursorZeichen[0] = "X";
+		menueCursorZeichen = "X";
 		menueAktion[1] = -1;
 
 		encoderPos = 0;
+
+		weckerEEPROMwriteState = HIGH;
+		weckerWriteDaten = 0;
 
 		menueEinstellung = LOW;
 	}
@@ -167,24 +223,27 @@ void weckerEbeneC_Zustand(){
 		weckerAusgabeZustand();
 	}
 }
-void weckerEbeneC_ZeitA(){
+void weckerEbeneC_Zeit(){
 	if(menueEinstellung == HIGH){
 		menueRotaryEncoder = LOW;
-		menueCursorZeichen[0] = "X";
+		menueCursorZeichen = "X";
 
 		menueAktion[2] = 2;
 
 		encoderPos = weckerDaten[weckerAuswahl][1];
 		encoderChanged = LOW;
 
+		weckerEEPROMwriteState = HIGH;
+		weckerWriteDaten = 1;
+
 		menueEinstellung = LOW;
 	}
 
-	if(encoderPos > 12){
+	if(encoderPos > 23){
 		encoderPos = 0;
 	}
 	if(encoderPos < 0){
-		encoderPos = 12;
+		encoderPos = 23;
 	}
 
 	weckerDaten[weckerAuswahl][1] = encoderPos;
@@ -194,7 +253,7 @@ void weckerEbeneC_ZeitA(){
 		encoderChanged = LOW;
 	}
 }
-void weckerEbeneC_ZeitB(){
+void weckerEbeneD_Zeit(){
 	if(menueEinstellung == HIGH){
 		menueAktion[2] = 2;
 
@@ -218,15 +277,127 @@ void weckerEbeneC_ZeitB(){
 		encoderChanged = LOW;
 	}
 }
+void weckerEbeneC_Wiederholen(){
+	if(menueEinstellung == HIGH){
+		menueFuehrungZustand = HIGH;
+		menueEintragSprung = LOW;
+		menueRotaryEncoder = HIGH;
+		menueZurueckPfeil = HIGH;
+		menueCursorZeichen = "<";
+
+		menueZeilenAnzahl = 7;
+
+		menueEintrag[1][0] = "Mo";
+		menueEintrag[2][0] = "Di";
+		menueEintrag[3][0] = "Mi";
+		menueEintrag[4][0] = "Do";
+		menueEintrag[5][0] = "Fr";
+		menueEintrag[6][0] = "Sa";
+		menueEintrag[7][0] = "So";
+
+		byte zaeler = 0;
+
+		for(short i = 1; i <= 7; i++){
+			menueEintrag[i][1] = " [";
+
+			if(weckerWiederholenTage[weckerAuswahl][i-1] == 0){
+				menueEintrag[i][2] = " ";
+			}
+			else{
+				menueEintrag[i][2] = "X";
+			}
+
+			zaeler += weckerWiederholenTage[weckerAuswahl][i-1];
+
+			if(zaeler > 0) weckerDaten[weckerAuswahl][3] = 1;
+			else weckerDaten[weckerAuswahl][3] = 0;
+
+			menueEintrag[i][3] = "]";
+		}
+
+		weckerEEPROMwriteState = HIGH;
+		weckerWriteDaten = 3;
+
+		menueEinstellung = LOW;
+	}
+
+	if(encoderButtonPressed == LOW){
+		weckerButtonStateA = HIGH;
+	}
+	if(encoderButtonPressed == HIGH && weckerButtonStateA == HIGH){
+		menueAdresse = 131111;
+	}
+}
+void weckerEbeneD_Wiederholen(){
+	if(weckerWiederholenTage[weckerAuswahl][menueAuswahl-1] == 1){
+		weckerWiederholenTage[weckerAuswahl][menueAuswahl-1] = 0;
+	}
+	else{
+		weckerWiederholenTage[weckerAuswahl][menueAuswahl-1] = 1;
+	}
+
+	weckerButtonStateA = LOW;
+
+	menueEinstellung = HIGH;
+	menueAdresse = 31111;
+}
+void weckerEbeneC_Ton(){
+	if(menueEinstellung == HIGH){
+		menueFuehrungZustand = HIGH;
+		menueEintragSprung = LOW;
+		menueRotaryEncoder = HIGH;
+		menueZurueckPfeil = HIGH;
+		menueCursorZeichen = "<";
+
+		if(anzahlToene == 0){
+			menueZeilenAnzahl = 1;
+
+			menueEintrag[1][0] = "*leer*";
+		}
+		else{
+			menueZeilenAnzahl = anzahlToene;
+			for(byte i = 1; i <= anzahlToene; i++){
+				menueEintrag[i][0] = weckerTonName[i-1];
+				menueEintrag[i][1] = "[";
+				menueEintrag[i][2] = " ";
+				menueEintrag[i][3] = "]";
+			}
+			menueEintrag[weckerDaten[weckerAuswahl][4]][2] = "X";
+		}
+
+		weckerEEPROMwriteState = HIGH;
+		weckerWriteDaten = 4;
+
+		menueEinstellung = LOW;
+	}
+
+	if(anzahlToene != 0){
+		if(encoderButtonPressed == LOW){
+			weckerButtonStateA = HIGH;
+		}
+		if(encoderButtonPressed == HIGH && weckerButtonStateA == HIGH){
+			menueAdresse = 141111;
+		}
+	}
+}
+void weckerEbeneD_Ton(){
+	weckerDaten[weckerAuswahl][4] = menueAuswahl;
+	weckerButtonStateA = LOW;
+	menueEinstellung = HIGH;
+	menueAdresse = 41111;
+}
 void weckerEbeneC_Lautstaerke(){
 	if(menueEinstellung == HIGH){
 		menueRotaryEncoder = LOW;
-		menueCursorZeichen[0] = "X";
+		menueCursorZeichen = "X";
 
 		menueAktion[5] = 2;
 
 		encoderPos = weckerDaten[weckerAuswahl][5];
 		encoderChanged = LOW;
+
+		weckerEEPROMwriteState = HIGH;
+		weckerWriteDaten = 5;
 
 		menueEinstellung = LOW;
 	}

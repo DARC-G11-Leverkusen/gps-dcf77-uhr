@@ -22,7 +22,7 @@
  * 				des aktuellen Menüs zurückgesetzt.
  *
  * 			menueEbeneTiefer()
- * 				Durch abrufrechtsen dieser Funktion wird zur nächst tieferen Ebene
+ * 				Durch abrufen dieser Funktion wird zur nächst tieferen Ebene
  * 				gesprungen (ohne menueReset() auszuführen), indem die menueAdresse
  * 				verändert wird (siehe menueAdresse).
  *
@@ -143,10 +143,10 @@ byte menueEintragSprung = LOW;
 byte menueFuehrungZustand = LOW;
 byte menueRotaryEncoder = 1;
 byte menueZurueckPfeil = 1;
-int menueEintraegeAnzahl = 1;
-char* menueCursorZeichen[1];
-char* menueEintrag[8][6];			//!!!! ERKLÄRUNG !!!!
-int menueAktion[8];
+int menueZeilenAnzahl = 1;
+char* menueCursorZeichen;
+char* menueEintrag[9][6];			//!!!! ERKLÄRUNG !!!!
+int menueAktion[9];
 
 long menueAdresse = 1;
 byte menueCursorPos = 0;  // 0 = oben ; 1 = unten
@@ -161,7 +161,7 @@ void menueReset(){
 	menueFuehrungZustand = LOW;
 	menueRotaryEncoder = 1;
 	menueZurueckPfeil = 1;
-	menueEintraegeAnzahl = 1;
+	menueZeilenAnzahl = 1;
 
 
 	menueAuswahl = 1;
@@ -170,7 +170,7 @@ void menueReset(){
 	lcd.clear();
 	memset(menueEintrag, 0, sizeof menueEintrag);
 	memset(menueAktion, 0, sizeof menueAktion);
-	memset(menueCursorZeichen, 0, sizeof menueCursorZeichen);
+	menueCursorZeichen = "";
 
 	menueEinstellung = HIGH;
 }
@@ -187,6 +187,9 @@ void menueEbeneHoeher(){
 		}
 		multiplier *= 10;
 	}
+
+	if(menueAdresse < 1) menueAdresse = 1;
+
 	menueEinstellung = HIGH;
 }
 
@@ -201,7 +204,6 @@ void menueEbeneTiefer(){
 		else{
 			multiplier *= 10;
 		}
-		Serial.println("FU");
 	}
 	menueEinstellung = HIGH;
 }
@@ -214,7 +216,7 @@ void menueEintraegePrint(short Auswahl){
 
 void menueFuehrung(){
 	if(menueFuehrungZustand == HIGH){
-		if(menueRotaryEncoder == 1 && menueEintraegeAnzahl+menueZurueckPfeil > 1){
+		if(menueRotaryEncoder == 1 && menueZeilenAnzahl+menueZurueckPfeil > 1){
 			if(encoderPos >= 1 && menueCursorPos == 0){
 				menueAuswahl++;
 				menueCursorPos = 1;
@@ -224,14 +226,14 @@ void menueFuehrung(){
 				menueAuswahl++;
 				//CursorPos bleibt 1
 
-				if(menueAuswahl > menueEintraegeAnzahl+menueZurueckPfeil){  //Cursor ist schon ganz unten
+				if(menueAuswahl > menueZeilenAnzahl+menueZurueckPfeil){  //Cursor ist schon ganz unten
 					if(menueEintragSprung == HIGH){
 						menueAuswahl = 1;
 						menueCursorPos = 0;
 						lcd.clear();
 					}
 					else{
-						menueAuswahl = menueEintraegeAnzahl+menueZurueckPfeil;
+						menueAuswahl = menueZeilenAnzahl+menueZurueckPfeil;
 					}
 				}
 				else lcd.clear();
@@ -242,7 +244,7 @@ void menueFuehrung(){
 
 				if(menueAuswahl < 1){  // Cursor ist schon ganz oben
 					if(menueEintragSprung == HIGH){
-						menueAuswahl = menueEintraegeAnzahl+menueZurueckPfeil;
+						menueAuswahl = menueZeilenAnzahl+menueZurueckPfeil;
 						menueCursorPos = 1;
 						lcd.clear();
 					}
@@ -267,7 +269,7 @@ void menueFuehrung(){
 
 			menueEintraegePrint(0);
 
-			if(menueEintraegeAnzahl+menueZurueckPfeil > 1){
+			if(menueZeilenAnzahl+menueZurueckPfeil > 1){
 				lcd.setCursor(0,1);
 				menueEintraegePrint(1);
 			}
@@ -276,14 +278,14 @@ void menueFuehrung(){
 			lcd.setCursor(0,0);
 			menueEintraegePrint(-1);
 
-			if(menueEintraegeAnzahl+menueZurueckPfeil > 1){
+			if(menueZeilenAnzahl+menueZurueckPfeil > 1){
 				lcd.setCursor(0,1);
 				menueEintraegePrint(0);
 			}
 		}
 
 		lcd.setCursor(15, menueCursorPos);
-		lcd.print(menueCursorZeichen[0]);
+		lcd.print(menueCursorZeichen);
 
 		/*Serial.print(encoderPos);
 		Serial.print("  ");
@@ -292,8 +294,8 @@ void menueFuehrung(){
 		/////////////////////////////
 
 		if(menueZurueckPfeil == 1){
-			menueEintrag[menueEintraegeAnzahl+1][0] = "<==";
-			menueAktion[menueEintraegeAnzahl+1] = -1;
+			menueEintrag[menueZeilenAnzahl+1][0] = "<==";
+			menueAktion[menueZeilenAnzahl+1] = -1;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
