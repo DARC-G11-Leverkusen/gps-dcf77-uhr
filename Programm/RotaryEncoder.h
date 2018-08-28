@@ -30,19 +30,23 @@
  * 	Ausgabe-Variablen:
  * 	==============================================================================
  * 		encoderPos
- * 			Diese Variable Beinhaltet die Position des Rotary Encoders. Nach
+ * 			Diese Variable beinhaltet die Position des Rotary Encoders. Nach
  * 			Starten des Programm ist sie als erstes 0.
  * 			Bei Drehen nach rechts wird die aktuelle Position + 1 gerechnet.
  * 			Bei Drehen nach links wird die aktuelle Position - 1 gerechnet.
  * 			Die Variable kann verändert werden.
  *
  * 		encoderButtonPressed
- * 			Diese Variable Beinhaltet den Zustand des Buttons des Rotary Encoders.
+ * 			Diese Variable beinhaltet den Zustand des Buttons des Rotary Encoders.
  * 			Wenn die Variable gleich LOW ist, ist der Button nicht gedrückt.
  * 			Wenn die Variable gleich HIGH ist, ist der Button gedrückt.
+ *
+ * 		encoderChanged
+ * 			Diese Variable beinhaltet die Information darüber, ob der Rotary Encoder
+ * 			gedreht wurde.
+ * 			Wenn der Rotary Encoder gedreht wird, wird sie als HIGH deklariert. Sie
+ * 			wird nicht wieder automatisch von dieser Library als LOW deklariert.
  */
-
-//!!!!!Erklärung zu Z.56 fehlt!!!!!
 
 #ifndef RotaryEncoder_h
 #define RotaryEncoder_h
