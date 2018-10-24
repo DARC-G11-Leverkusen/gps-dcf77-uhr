@@ -2,7 +2,10 @@
  *	Wecker-Modul des Projektes "Arduino Uhr" der Jugendgruppe
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  *
- * 	geschrieben von Ralf Rumbler, DO3KV 13.7.2018
+ * 	geschrieben von Ralf Rumbler, DO3KV 24.10.2018
+ *
+ *
+ *	vom Modul benötigte EEPROM-Adressen: 0 bis 34
  */
 
 #ifndef WeckerModul_h
@@ -11,17 +14,9 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
-short weckerDaten[5][6];
-byte weckerWiederholenTage[5][7];
-byte weckerAuswahl;
-byte weckerButtonStateA = LOW;
-char* weckerTonName[3];
-byte weckerEEPROMwriteState = LOW;
-byte weckerWriteDaten;
-byte anzahlToene;
-
-/*	WECKERDATEN:
- * 	=============
+byte weckerDaten[5][7];
+/*	Belegung von weckerDaten:
+ * 	==========================
  *	weckerDaten[weckerAuswahl][0] >> Zustand >> 1 = AN ; 0 = AUS
  * 	weckerDaten[weckerAuswahl][1] >> Zeit: Stunden >> ab 1
  * 	weckerDaten[weckerAuswahl][2] >> Zeit: Minuten >> ab 1
@@ -29,38 +24,68 @@ byte anzahlToene;
  * 	weckerDaten[weckerAuswahl][4] >> Nummer vom ausgewählten Ton >> ab 1 ; bis 3
  * 	anzahlToene >> Anzahl der eingespeicherten Töne
  * 	weckerDaten[weckerAuswahl][5] >> Lautstärke Ton in %
+ * 	weckerDaten[weckerAuswahl][6] >> zu Wiederholende Tage (in Bits)
  */
-
-/* 	EEPROM ADRESSEN:
- * 	=================
- * 	 0 bis 29 >> weckerDaten[][]
- * 	30 bis  ? >> weckerBoolPackTage
- */
+byte weckerAuswahl;
+byte weckerButtonStateA = LOW;
+char* weckerTonName[3];
+byte weckerEEPROMwriteState = LOW;
+byte weckerWriteDaten;
+byte anzahlToene;
 
 char weckerBufferA[12];
 char weckerBufferB[12];
 char weckerBufferC[12];
 char weckerBufferD[12];
 
+///////////////////////////////////////////////////////////////////////////////////
+
 void weckerEEPROMwrite(){
-	EEPROM.write((weckerAuswahl*6)+weckerWriteDaten, weckerDaten[weckerAuswahl][weckerWriteDaten]);
+	EEPROM.write((weckerAuswahl*7)+weckerWriteDaten, weckerDaten[weckerAuswahl][weckerWriteDaten]);
 	if(weckerWriteDaten == 1){
-		EEPROM.write((weckerAuswahl*6)+2, weckerDaten[weckerAuswahl][2]);
+		EEPROM.write((weckerAuswahl*7)+2, weckerDaten[weckerAuswahl][2]);
+	}
+	else if(weckerWriteDaten == 3){
+		EEPROM.write((weckerAuswahl*7)+6, weckerDaten[weckerAuswahl][6]);
 	}
 
 	/*if(weckerWriteDaten == 3){
 		EEPROM.write(weckerAuswahl+30, weckerBoolPackTage[weckerAuswahl]);
 	}*/
-	Serial.print("EEPROM write");
+
+	//Ausgabe für Fehlerbehebung////////
+	Serial.print("EEPROM write ");
+
+	Serial.print((weckerAuswahl*7)+weckerWriteDaten);
+	Serial.print(" ");
+	Serial.print(weckerDaten[weckerAuswahl][weckerWriteDaten]);
+
+	if(weckerWriteDaten == 1){
+		Serial.print(" ; ");
+		Serial.print((weckerAuswahl*7)+2);
+		Serial.print(" ");
+		Serial.print(weckerDaten[weckerAuswahl][2]);
+	}
+	else if(weckerWriteDaten == 3){
+		Serial.print(" ; ");
+		Serial.print((weckerAuswahl*7)+6);
+		Serial.print(" ");
+		Serial.print(weckerDaten[weckerAuswahl][6]);
+	}
+	Serial.println();
+	////////////////////////////////////
 }
 void weckerEEPROMread(){
 	for(byte a = 0; a <= 4; a++){
-		for(byte b = 0; b <= 5; b++){
-			weckerDaten[a][b] = EEPROM.read((a*6)+b);
+		for(byte b = 0; b <= 6; b++){
+			weckerDaten[a][b] = EEPROM.read((a*7)+b);
 		}
 		//weckerBoolPackTage[a] = EEPROM.read(a+30);
 	}
+	Serial.println("EEPROM read");
 }
+
+/////////////////////////////////////////////////////
 
 void weckerAusgabeZustand(){
 	if(weckerDaten[weckerAuswahl][0] == 1){
@@ -133,6 +158,8 @@ void weckerAusgabeLautstaerke(){
 
 	menueEintrag[5][3] = "%";
 }
+
+/////////////////////////////////////////////////////
 
 void weckerEbeneA(){
 	if(menueEinstellung == HIGH){
@@ -300,14 +327,14 @@ void weckerEbeneC_Wiederholen(){
 		for(short i = 1; i <= 7; i++){
 			menueEintrag[i][1] = " [";
 
-			if(weckerWiederholenTage[weckerAuswahl][i-1] == 0){
+			if(bitRead(weckerDaten[weckerAuswahl][6], i-1) == 0){
 				menueEintrag[i][2] = " ";
 			}
 			else{
 				menueEintrag[i][2] = "X";
 			}
 
-			zaeler += weckerWiederholenTage[weckerAuswahl][i-1];
+			zaeler += bitRead(weckerDaten[weckerAuswahl][6], i-1);
 
 			if(zaeler > 0) weckerDaten[weckerAuswahl][3] = 1;
 			else weckerDaten[weckerAuswahl][3] = 0;
@@ -329,11 +356,11 @@ void weckerEbeneC_Wiederholen(){
 	}
 }
 void weckerEbeneD_Wiederholen(){
-	if(weckerWiederholenTage[weckerAuswahl][menueAuswahl-1] == 1){
-		weckerWiederholenTage[weckerAuswahl][menueAuswahl-1] = 0;
+	if(bitRead(weckerDaten[weckerAuswahl][6], menueAuswahl-1) == 1){
+		bitWrite(weckerDaten[weckerAuswahl][6], menueAuswahl-1, 0);
 	}
 	else{
-		weckerWiederholenTage[weckerAuswahl][menueAuswahl-1] = 1;
+		bitWrite(weckerDaten[weckerAuswahl][6], menueAuswahl-1, 1);
 	}
 
 	weckerButtonStateA = LOW;
