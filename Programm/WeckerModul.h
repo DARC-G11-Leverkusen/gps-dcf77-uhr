@@ -2,7 +2,7 @@
  *	Wecker-Modul des Projektes "Arduino Uhr" der Jugendgruppe
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  *
- * 	geschrieben von Ralf Rumbler, DO3KV 24.10.2018
+ * 	geschrieben von Ralf Rumbler, DO3KV 25.10.2018
  *
  *
  *	vom Modul benötigte EEPROM-Adressen: 0 bis 34
@@ -31,7 +31,11 @@ byte weckerButtonStateA = LOW;
 char* weckerTonName[3];
 byte weckerEEPROMwriteState = LOW;
 byte weckerWriteDaten;
-byte anzahlToene;
+byte weckerAnzahlToene;
+/*	byte weckerStunde;	//temporär
+ *	byte weckerMinute;	//temporär
+ *	byte weckerTag;		//temporär
+ */
 
 char weckerBufferA[12];
 char weckerBufferB[12];
@@ -157,7 +161,7 @@ void weckerAusgabeLautstaerke(){
 	menueEintrag[5][3] = "%";
 }
 
-/////////////////////////////////////////////////////
+///////////////////////////////////
 
 void weckerEbeneA(){
 	if(menueEinstellung == HIGH){
@@ -374,14 +378,14 @@ void weckerEbeneC_Ton(){
 		menueZurueckPfeil = HIGH;
 		menueCursorZeichen = "<";
 
-		if(anzahlToene == 0){
+		if(weckerAnzahlToene == 0){
 			menueZeilenAnzahl = 1;
 
 			menueEintrag[1][0] = "*leer*";
 		}
 		else{
-			menueZeilenAnzahl = anzahlToene;
-			for(byte i = 1; i <= anzahlToene; i++){
+			menueZeilenAnzahl = weckerAnzahlToene;
+			for(byte i = 1; i <= weckerAnzahlToene; i++){
 				menueEintrag[i][0] = weckerTonName[i-1];
 				menueEintrag[i][1] = "[";
 				menueEintrag[i][2] = " ";
@@ -396,7 +400,7 @@ void weckerEbeneC_Ton(){
 		menueEinstellung = LOW;
 	}
 
-	if(anzahlToene != 0){
+	if(weckerAnzahlToene != 0){
 		if(encoderButtonPressed == LOW){
 			weckerButtonStateA = HIGH;
 		}
@@ -441,6 +445,16 @@ void weckerEbeneC_Lautstaerke(){
 		encoderChanged = LOW;
 	}
 }
+
+/////////////////////////////////////////////////////
+
+/*void weckerFuehrung(){
+	for(byte i = 0; i <= 4; i++){
+		if(weckerDaten[i][2] == weckerMinute && weckerDaten[i][1] == weckerStunde && *Tag ist richtig* && weckerDaten[i][0] == HIGH){
+			//wecker klingelt
+		}
+	}
+}*/
 
 #endif
 
