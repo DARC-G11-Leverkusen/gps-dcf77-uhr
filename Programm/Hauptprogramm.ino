@@ -34,7 +34,7 @@ void loop(){
 			menueZurueckPfeil = LOW;
 			menueZeilenAnzahl = 1;
 
-			menueEintrag[1][0] = "*Ruhe-Ebene*";
+			menueEintrag[1][1] = "*Ruhe-Ebene*";
 			menueAktion[1] = 1;
 
 			menueEinstellung = LOW;
@@ -51,7 +51,7 @@ void loop(){
 			menueZeilenAnzahl = 1;
 			menueCursorZeichen = "<";
 
-			menueEintrag[1][0] = "Wecker";
+			menueEintrag[1][1] = "Wecker";
 			menueAktion[1] = 1;
 
 			weckerButtonStateA = LOW;
@@ -86,7 +86,7 @@ void loop(){
 			menueZeilenAnzahl = 1;
 			menueCursorZeichen = "<";
 
-			menueEintrag[1][0] = "*Ebene leer*";
+			menueEintrag[1][1] = "*Ebene leer*";
 			menueAktion[1] = 0;
 
 			menueEinstellung = LOW;
