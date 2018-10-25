@@ -49,12 +49,8 @@ void weckerEEPROMwrite(){
 		EEPROM.write((weckerAuswahl*7)+6, weckerDaten[weckerAuswahl][6]);
 	}
 
-	/*if(weckerWriteDaten == 3){
-		EEPROM.write(weckerAuswahl+30, weckerBoolPackTage[weckerAuswahl]);
-	}*/
-
 	//Ausgabe für Fehlerbehebung////////
-	Serial.print("EEPROM write ");
+	/*Serial.print("EEPROM write ");
 
 	Serial.print((weckerAuswahl*7)+weckerWriteDaten);
 	Serial.print(" ");
@@ -72,7 +68,7 @@ void weckerEEPROMwrite(){
 		Serial.print(" ");
 		Serial.print(weckerDaten[weckerAuswahl][6]);
 	}
-	Serial.println();
+	Serial.println();*/
 	////////////////////////////////////
 }
 void weckerEEPROMread(){
@@ -80,9 +76,11 @@ void weckerEEPROMread(){
 		for(byte b = 0; b <= 6; b++){
 			weckerDaten[a][b] = EEPROM.read((a*7)+b);
 		}
-		//weckerBoolPackTage[a] = EEPROM.read(a+30);
 	}
-	Serial.println("EEPROM read");
+
+	//Ausgabe für Fehlerbehebung////////
+	//Serial.println("EEPROM read");
+	////////////////////////////////////
 }
 
 /////////////////////////////////////////////////////
