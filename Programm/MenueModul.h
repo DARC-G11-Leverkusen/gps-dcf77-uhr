@@ -2,7 +2,7 @@
  *	Menü-Modul des Projektes "Arduino Uhr" der Jugendgruppe
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  *
- * 	geschrieben von Ralf Rumbler, DO3KV 13.7.2018
+ * 	geschrieben von Ralf Rumbler, DO3KV 25.10.2018
  */
 
 /********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DES MODULS********
@@ -32,7 +32,7 @@
  * 				verändert wird (siehe menueAdresse).
  *
  *
- *		Ausgabe-Variablen:
+ *		ausgebende/Werte tragende  Variablen:
  * 		==========================================================================
  *			menueAdresse
  *				Diese Variable trägt die Adresse der aktuellen Ebene. Nach Starten
@@ -65,7 +65,7 @@
  *				befindet (0 = Zeile 1, 1 = Zeile 2).
  *
  *
- * 		Zu deklarierende Variablen:
+ * 		einzustellende Variablen:
  * 		==========================================================================
  * 			menueFuehrungZustand = HIGH/LOW;
  * 				Diese Deklaration aktiviert (HIGH), oder deaktiviert (LOW) alle
@@ -90,17 +90,19 @@
  *
  * 			menueEinträgeAnzahl = X;
  * 				Durch die Deklaration dieser Variable wird die Anzahl der
- * 				Menü-Einträge X (min. 0, max. 7 mit Zurück Pfeil Eintrag) der
- * 				Menü-Ebene festgelegt.
+ * 				Menü-Einträge X (min. 0, max. 8 einschließlich Zurück-Pfeil Eintrag)
+ * 				der Menü-Ebene festgelegt.
  *
  * 			menueCursorZeichen = X;
  * 				Diesem String wird das Zeichen X, welches als Cursor benutzt werden
  * 				soll, zugewiesen (wie z.B. "<").
  *
  *
- * 			menueEintrag[Y] = X;
+ *
+ * 			menueEintrag[Y][Z] = X;
  * 				Diesem String wird die Zeichenfolge X (max. 14 Zeichen) zugewiesen,
- * 				welche der Menü-Eintrag Y ist.
+ * 				welche der Menü-Eintrag Z (min. 1, max.5) in Zeile Y (min. 1, max.8)
+ * 				ist.
  *
  * 			menueAktion[Y] = X;
  * 				Diesem String wird die Aktion X (siehe unten) zugewiesen, welche
@@ -114,19 +116,17 @@
  * 				X = 1:
  * 				 - springe eine Ebene tiefer
  *
- * 				X = 2:
- * 				 - springe eine Ebene tiefer OHNE Einstellungen des Menü-
- * 				   Eintrages zu löschen
- *
  *				X = -1:
  * 				 - springe eine Ebene höher
+ *
+ * 				X = 2:
+ * 				 - springe eine Ebene tiefer OHNE Einstellungen der Menü-Ebene zu
+ * 				   löschen (, d.h. die deklarierten Variablen auf 0 zu setzen).
  *
  * 				X = -2:
  * 				 - springe eine Ebene höher OHNE Einstellungen des Menü-
  * 				   Eintrages zu löschen
  */
-
-//!!!! Erklärung zu Z. 148, Z. 155 fehlt!!!!
 
 #ifndef MenueModul_h
 #define MenueModul_h
@@ -145,14 +145,14 @@ byte menueRotaryEncoder = 1;
 byte menueZurueckPfeil = 1;
 int menueZeilenAnzahl = 1;
 char* menueCursorZeichen;
-char* menueEintrag[9][6];			//!!!! ERKLÄRUNG !!!!
+char* menueEintrag[9][6];
 int menueAktion[9];
 
 long menueAdresse = 1;
 byte menueCursorPos = 0;  // 0 = oben ; 1 = unten
 int menueAuswahl = 1; 	 // Auswahl sagt auf welchem MenueEintrag[] Cursor ist
 byte menueButtonAktion;
-byte menueEinstellung = HIGH;		//!!!! ERKLÄRUNG !!!!
+byte menueEinstellung = HIGH;
 
 
 
