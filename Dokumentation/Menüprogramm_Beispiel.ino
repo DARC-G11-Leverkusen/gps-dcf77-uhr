@@ -22,32 +22,34 @@ void setup(){
 void loop(){
 	switch(menueAdresse){	//menueAdresse max. =2.147.483.647
 	case 23:{	//Wenn die menueAdresse 23 ist, wird das folgende Menü erstellt:
-		//////////Zu deklarierende Variablen://////////
-		//Einstellungen:
-		menueFuehrungZustand = HIGH;	//	Menü soll erstellt werden
-		menueEintragSprung = LOW;		/*	kein Sprung bei weiterdrehen des Rotary
-										 *  Encoders nach erreichen des letzten
-										 *  Eintrages
-										 */
-		menueRotaryEncoder = HIGH;		//	Rotary Encoder soll Cursor steuern
-		menueZurueckPfeil = HIGH;		/*	Ein Pfeil zum Springen in nächst höhere
-										 *	Ebene soll vorhanden sein
-										 */
-		menueEintraegeAnzahl = 3;		//	Festlegung der Anzahl der Menü-Einträge
-		menueCursorZeichen[0] = "<";	//	Auswahl des Cursor Zeichens
+		if(menueEinstellung == HIGH){
+			//////////Zu deklarierende Variablen://////////
+			//Einstellungen:
+			menueFuehrungZustand = HIGH;	//	Menü soll erstellt werden
+			menueEintragSprung = LOW;		/*	kein Sprung bei weiterdrehen des Rotary
+			 	 	 	 	 	 	 	 	 *  Encoders nach erreichen des letzten
+			 	 	 	 	 	 	 	 	 *  Eintrages
+			 	 	 	 	 	 	 	 	 */
+			menueRotaryEncoder = HIGH;		//	Rotary Encoder soll Cursor steuern
+			menueZurueckPfeil = HIGH;		/*	Ein Pfeil zum Springen in nächst höhere
+										 	 *	Ebene soll vorhanden sein
+										 	 */
+			menueZeilenAnzahl = 3;			//	Festlegung der Anzahl der Menü-Einträge
+			menueCursorZeichen = "<";		//	Auswahl des Cursor Zeichens
 
-		//Einträge:
-		menueEintrag[1] = "Eintrag A";	//	Zeichenfolge des Eintrages Nummer 1
-		menueAktion[1] = 1;				/* 	Aktion bei Klicken auf Eintrag ist:
-										 *	1 => in nächst tiefere Ebene springen
-										 */
-		menueEintrag[2] = "Eintrag B";	//	Zeichenfolge des Eintrages Nummer 2
-		menueAktion[2] = -1;			/* 	Aktion bei Klicken auf Eintrag ist:
-										 *	-1 => in nächst höhere Ebene springen
-										 */
-		menueEintrag[3] = "Eintrag C";	//	Zeichenfolge des Eintrages Nummer 3
-										//	=> keine Aktion bei Klicken auf Eintrag
-		///////////////////////////////////////////////
+			//Einträge:
+			menueEintrag[1][1] = "Eintrag A";	//	Zeichenfolge des Eintrages Nummer 1
+			menueAktion[1] = 1;					/* 	Aktion bei Klicken auf Eintrag ist:
+			 	 	 	 	 	 	 	 	 	 *	1 => in nächst tiefere Ebene springen
+			 	 	 	 	 	 	 	 	 	 */
+			menueEintrag[2][1] = "Eintrag B";	//	Zeichenfolge des Eintrages Nummer 2
+			menueAktion[2] = -1;				/* 	Aktion bei Klicken auf Eintrag ist:
+			 	 	 	 	 	 	 	 	 	 *	-1 => in nächst höhere Ebene springen
+			 	 	 	 	 	 	 	 	 	 */
+			menueEintrag[3][1] = "Eintrag C";	//	Zeichenfolge des Eintrages Nummer 3
+												//	=> keine Aktion bei Klicken auf Eintrag
+			///////////////////////////////////////////////
+		}
 	}break;
 	}
 
