@@ -1,8 +1,8 @@
 /*
- *	Menü-Modul des Projektes "Arduino Uhr" der Jugendgruppe
+ *	Dies ist das Menü-Modul des Projektes "Arduino Uhr" der Jugendgruppe
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  *
- * 	geschrieben von Ralf Rumbler, DO3KV 25.10.2018
+ * 	geschrieben von Ralf Rumbler, DO3KV
  */
 
 /********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DES MODULS********
@@ -101,8 +101,8 @@
  *
  * 			menueEintrag[Y][Z] = X;
  * 				Diesem String wird die Zeichenfolge X (max. 14 Zeichen) zugewiesen,
- * 				welche der Menü-Eintrag Z (min. 1, max.5) in Zeile Y (min. 1, max.8)
- * 				ist.
+ * 				welche der Menü-Eintrag Z (min. 1, max. 6) in Zeile Y (min. 1, max.
+ * 				8) ist.
  *
  * 			menueAktion[Y] = X;
  * 				Diesem String wird die Aktion X (siehe unten) zugewiesen, welche
@@ -145,7 +145,7 @@ byte menueRotaryEncoder = 1;
 byte menueZurueckPfeil = 1;
 int menueZeilenAnzahl = 1;
 char* menueCursorZeichen;
-char* menueEintrag[9][6];
+char* menueEintrag[9][7];
 int menueAktion[9];
 
 long menueAdresse = 1;
@@ -209,7 +209,7 @@ void menueEbeneTiefer(){
 }
 
 void menueEintraegePrint(short Auswahl){
-	for(byte i = 0; i <= 5; i++){
+	for(byte i = 0; i <= 6; i++){
 		lcd.print(menueEintrag[menueAuswahl+Auswahl][i]);
 	}
 }
