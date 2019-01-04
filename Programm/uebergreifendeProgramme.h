@@ -6,8 +6,6 @@
  *	von IGEL e.V. und DARC e.V. .
  */
 
-//************************
-
 #ifndef uebergreifendeProgramme_h
 #define uebergreifendeProgramme_h
 
