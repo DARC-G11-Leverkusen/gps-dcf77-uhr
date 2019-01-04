@@ -1,8 +1,8 @@
 /*
- *	Wecker-Modul des Projektes "Arduino Uhr" der Jugendgruppe
+ *	Dies ist das Wecker-Modul des Projektes "Arduino Uhr" der Jugendgruppe
  *	des OVs G11 Leverkusen von IGEL e.V. und DARC e.V. .
  *
- * 	geschrieben von Ralf Rumbler, DO3KV 25.10.2018
+ * 	geschrieben von Ralf Rumbler, DO3KV
  *
  *
  *	vom Modul benötigte EEPROM-Adressen: 0 bis 34
@@ -13,6 +13,7 @@
 
 #include <Arduino.h>
 #include <EEPROM.h>
+#include "uebergreifendeProgramme.h"
 
 byte weckerDaten[5][7];
 /*	Belegung von weckerDaten:
@@ -36,11 +37,6 @@ byte weckerAnzahlToene;
  *	byte weckerMinute;	//temporär
  *	byte weckerTag;		//temporär
  */
-
-char weckerBufferA[12];
-char weckerBufferB[12];
-char weckerBufferC[12];
-char weckerBufferD[12];
 
 ///////////////////////////////////////////////////////////////////////////////////
 
@@ -98,8 +94,8 @@ void weckerAusgabeZustand(){
 	}
 }
 void weckerAusgabeZeit(){
-	memset(weckerBufferA, 0, sizeof weckerBufferA);
-	memset(weckerBufferB, 0, sizeof weckerBufferB);
+	memset(itoaBufferA, 0, sizeof itoaBufferA);
+	memset(itoaBufferB, 0, sizeof itoaBufferB);
 
 	if(weckerDaten[weckerAuswahl][1] < 10){
 		menueEintrag[2][1] = " ";
@@ -107,8 +103,8 @@ void weckerAusgabeZeit(){
 	else{
 		menueEintrag[2][1] = "";
 	}
-	itoa(weckerDaten[weckerAuswahl][1], weckerBufferA, 10);
-	menueEintrag[2][2] = weckerBufferA;
+	itoa(weckerDaten[weckerAuswahl][1], itoaBufferA, 10);
+	menueEintrag[2][2] = itoaBufferA;
 
 	menueEintrag[2][3] = ":";
 
@@ -118,8 +114,8 @@ void weckerAusgabeZeit(){
 	else{
 		menueEintrag[2][4] = "";
 	}
-	itoa(weckerDaten[weckerAuswahl][2], weckerBufferB, 10);
-	menueEintrag[2][5] = weckerBufferB;
+	itoa(weckerDaten[weckerAuswahl][2], itoaBufferB, 10);
+	menueEintrag[2][5] = itoaBufferB;
 }
 void weckerAusgabeWiederholen(){
 	if(weckerDaten[weckerAuswahl][3] == 1){
@@ -130,20 +126,20 @@ void weckerAusgabeWiederholen(){
 	}
 }
 void weckerAusgabeTon(){
-	memset(weckerBufferC, 0, sizeof weckerBufferC);
+	memset(itoaBufferC, 0, sizeof itoaBufferC);
 
 	if(weckerDaten[weckerAuswahl][4] > 0){
 		menueEintrag[4][1] = "Nr. ";
 
-		itoa(weckerDaten[weckerAuswahl][4], weckerBufferC, 10);
-		menueEintrag[4][2] = weckerBufferC;
+		itoa(weckerDaten[weckerAuswahl][4], itoaBufferC, 10);
+		menueEintrag[4][2] = itoaBufferC;
 	}
 	else{
 		menueEintrag[4][1] = "    -";
 	}
 }
 void weckerAusgabeLautstaerke(){
-	memset(weckerBufferD, 0, sizeof weckerBufferD);
+	memset(itoaBufferD, 0, sizeof itoaBufferD);
 
 	if(weckerDaten[weckerAuswahl][5] < 10){
 		menueEintrag[5][1] = "  ";
@@ -155,8 +151,8 @@ void weckerAusgabeLautstaerke(){
 		menueEintrag[5][1] = "";
 	}
 
-	itoa(weckerDaten[weckerAuswahl][5], weckerBufferD, 10);
-	menueEintrag[5][2] = weckerBufferD;
+	itoa(weckerDaten[weckerAuswahl][5], itoaBufferD, 10);
+	menueEintrag[5][2] = itoaBufferD;
 
 	menueEintrag[5][3] = "%";
 }
@@ -422,7 +418,7 @@ void weckerEbeneC_Lautstaerke(){
 
 		menueAktion[5] = 2;
 
-		encoderPos = weckerDaten[weckerAuswahl][5];
+		encoderPos = weckerDaten[weckerAuswahl][5] / 10;
 		encoderChanged = LOW;
 
 		weckerEEPROMwriteState = HIGH;
