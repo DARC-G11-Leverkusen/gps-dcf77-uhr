@@ -2,8 +2,7 @@
  * The code is written by Simon Merrett and bases on insight from Oleg Mazurov,
  * Nick Gammon, rt and Steve Spence, and code from Nick Gammon.
  *
- * It was put together to a library and was edited by Ralf Rumbler, DO3KV
- * on 13.7.2018.
+ * It was put together to a library and was edited by Ralf Rumbler, DO3KV.
  */
 
 /********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DER LIBRARY********
