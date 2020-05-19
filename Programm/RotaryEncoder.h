@@ -5,13 +5,13 @@
  * It was put together to a library and was edited by Ralf Rumbler, DO3KV.
  */
 
-/********ERKLÃ„RUNG DER FUNKTIONEN & VARIABLEN DER LIBRARY********
+/********ERKLÄRUNG DER FUNKTIONEN & VARIABLEN DER LIBRARY********
  *
  * 	Funktionen:
  * 	==============================================================================
  *		encoderBegin(pinA, pinB, buttonPin)
  *			Diese Funktion muss in der Setup() Funktion aufgerufen werden, damit
- *			die Library funktionsfÃ¤hig ist. Durch sie wird auch das Lesen des
+ *			die Library funktionsfähig ist. Durch sie wird auch das Lesen des
  *			Rotary Encoders per Interrupts aktiviert.
  *
  *			Zu deklarieren sind...
@@ -33,15 +33,15 @@
  * 			Starten des Programm ist sie als erstes 0.
  * 			Bei Drehen nach rechts wird die aktuelle Position + 1 gerechnet.
  * 			Bei Drehen nach links wird die aktuelle Position - 1 gerechnet.
- * 			Die Variable kann verÃ¤ndert werden.
+ * 			Die Variable kann verändert werden.
  *
  * 		encoderButtonPressed
  * 			Diese Variable beinhaltet den Zustand des Buttons des Rotary Encoders.
- * 			Wenn die Variable gleich LOW ist, ist der Button nicht gedrÃ¼ckt.
- * 			Wenn die Variable gleich HIGH ist, ist der Button gedrÃ¼ckt.
+ * 			Wenn die Variable gleich LOW ist, ist der Button nicht gedrückt.
+ * 			Wenn die Variable gleich HIGH ist, ist der Button gedrückt.
  *
  * 		encoderChanged
- * 			Diese Variable beinhaltet die Information darÃ¼ber, ob der Rotary Encoder
+ * 			Diese Variable beinhaltet die Information darüber, ob der Rotary Encoder
  * 			gedreht wurde.
  * 			Wenn der Rotary Encoder gedreht wird, wird sie als HIGH deklariert. Sie
  * 			wird nicht wieder automatisch von dieser Library als LOW deklariert.
@@ -71,7 +71,7 @@ void PinA(){ //Rotary encoder interrupt service routine for one encoder pin
   cli(); //stop interrupts happening before we read pin values
   reading = PIND & 0xC; // read all eight pin values then strip away all but pinA and pinB's values
   if(reading == B00001100 && aFlag) { //check that we have both pins at detent (HIGH) and that we are expecting detent on this pin's rising edge
-    encoderPos --; //decrement the encoder's position count
+    encoderPos ++; //decrement the encoder's position count
     encoderChanged = HIGH;
     bFlag = 0; //reset flags for the next turn
     aFlag = 0; //reset flags for the next turn
@@ -83,7 +83,7 @@ void PinB(){ //Rotary encoder interrupt service routine for the other encoder pi
   cli(); //stop interrupts happening before we read pin values
   reading = PIND & 0xC; //read all eight pin values then strip away all but pinA and pinB's values
   if (reading == B00001100 && bFlag) { //check that we have both pins at detent (HIGH) and that we are expecting detent on this pin's rising edge
-    encoderPos ++; //increment the encoder's position count
+    encoderPos --; //increment the encoder's position count
     encoderChanged = HIGH;
     bFlag = 0; //reset flags for the next turn
     aFlag = 0; //reset flags for the next turn

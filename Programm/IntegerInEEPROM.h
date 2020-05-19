@@ -9,7 +9,7 @@
 #define IntegerInEEPROM_h
 
 #include <Arduino.h>
-#include <EEPROM.h>
+#include "EEPROM.h"
 
 int eepromReadInt(int adr) {
   // 2 Byte Integer Zahl aus dem EEPROM lesen an der Adresse
@@ -30,7 +30,7 @@ void eepromWriteInt(int adr, int wert) {
   // 2 Byte Integer Zahl im EEPROM ablegen an der Adresse
   // Eingabe:
   //   adr: Adresse +0 und +1 wird geschrieben
-  //   wert: mÃ¶glicher Wertebereich -32,768 bis 32,767
+  //   wert: möglicher Wertebereich -32,768 bis 32,767
   // Ausgabe:
   //   -
   // 2 Byte Platz werden belegt.
