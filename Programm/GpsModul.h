@@ -2,8 +2,9 @@
 #define GpsModul_h
 
 #include "Arduino.h"
+
+#include "BrueckenModul.h"
 #include "SmallAdafruit_GPS.h"
-#include "UebergreifendeProgramme.h"
 
 SoftwareSerial gpsSerial(A3, A2); // TX, RX
 SmallAdafruit_GPS GPS(&gpsSerial);

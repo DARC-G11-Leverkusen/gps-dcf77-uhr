@@ -8,8 +8,8 @@
  *	Wochentagsberechnung von Franz Bachler (http://members.aon.at/fraba/wochtag.htm)
  */
 
-#ifndef UebergreifendeProgramme_h
-#define UebergreifendeProgramme_h
+#ifndef BrueckenModul_h
+#define BrueckenModul_h
 
 char itoaBufferA[12];
 char itoaBufferB[12];

@@ -12,9 +12,10 @@
 #define ZeitModul_h
 
 #include <Arduino.h>
+
+#include "BrueckenModul.h"
 #include "GpsModul.h"
 #include "InterneZeitModul.h"
-#include "UebergreifendeProgramme.h"
 
 int zeitZeitzone;
 byte zeitSekunden, zeitStunden, zeitMinuten, zeitTag = 1, zeitMonat = 1;
